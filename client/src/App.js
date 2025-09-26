@@ -11,6 +11,8 @@ import MovieView from './pages/MovieView';
 import { UserProvider } from './UserContext';
 import AddMovie from './pages/AddMovie';
 
+// ✅ NEW IMPORT for Admin Dashboard
+import AdminView from './components/AdminView';
 
 function App() {
 
@@ -24,7 +26,6 @@ function App() {
     };
 
     useEffect(() => {
-
         fetch(`http://localhost:4000/users/details`, {
             headers: {
                 Authorization: `Bearer ${ localStorage.getItem('token') }`
@@ -32,16 +33,12 @@ function App() {
         })
         .then(res => res.json())
         .then(data => {
-          
             if (typeof data.user !== "undefined") {
-
                 setUser({
                   id: data.user._id,
                   isAdmin: data.user.isAdmin
                 });
-
             } else {
-
                 setUser({
                   id: null,
                   isAdmin: null
@@ -62,6 +59,9 @@ function App() {
                     <Route path="/movies" element={<Movies />} />
                     <Route path="/movies/:movieId" element={<MovieView />}/>
                     <Route path="/logout" element={<Logout />} />
+
+                    {/* ✅ NEW ROUTE for Admin Dashboard */}
+                    <Route path="/AdminDashboard" element={<AdminView />} />
                 </Routes>
             </Router>
         </UserProvider>

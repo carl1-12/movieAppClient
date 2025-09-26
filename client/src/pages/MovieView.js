@@ -28,15 +28,14 @@ export default function MovieView() {
 
 
 	const openComment = (movieId) => {
-		fetch(`http://localhost:4000/movies/${movieId}`)
+		fetch(`http://localhost:4000/movies/getMovie/${movieId}`)
 		.then(res => res.json())
 		.then(data => {
 			setTitle(data.title);
-		})
+		});
 
 		setShowComment(true);
 	}
-
 	const closeComment = () => {
 		setShowComment(false);
 		setTitle("");
@@ -83,7 +82,7 @@ export default function MovieView() {
 
 		fetch(`http://localhost:4000/movies/getMovie/${movieId}`, {
 			headers: {
-			    Authorization: `Bearer ${localStorage.getItem('token')}`
+				Authorization: `Bearer ${localStorage.getItem('token')}`
 			}
 		})
 		.then(res => res.json())
@@ -100,10 +99,10 @@ export default function MovieView() {
 
 			const commentsArr = data.comments.map(comment => {
 				console.log(comment)
-		 		return (
-		 			<CommentCard commentProp={comment} key={comment._id}/>
-		 		)
-		 	})
+				return (
+					<CommentCard commentProp={comment} key={comment._id}/>
+					)
+			})
 
 			setComments(commentsArr)
 		});
@@ -114,56 +113,60 @@ export default function MovieView() {
 	return(
 		<>
 
-			<Container fluid className="pt-4">
-					<Row className="mx-5">
-						<Col className="mt-3 p-3 col-lg-4 text-center mx-auto">
-							<Image fluid src="https://cdn-icons-png.freepik.com/512/2798/2798007.png" className='mb-2'/>
-							<hr/>
-							<h1 className='mt-1'> { title } </h1>
-							<span> Year: {year} </span>
-							<p><span> Genre: {genre} </span></p>
-							<p> {description} </p>
-							<p><strong>Director:</strong> {director}</p>
-							<div className='p-3 mt-3'>
-								<div className='my-5'>
-									<h3>Comments</h3>
-									<hr/>
-									<p className='pt-3'>{comments.length > 0 ? comments : "No Comments Yet"}</p>
-								</div>
-								<div>
-									{user.id !== null ? <Button variant="primary" size="sm" onClick={() => openComment(movieId)} className="mx-3"> Add Comment </Button> : "Please Login To Comment"}
-								</div>
+		<Container fluid className="pt-4">
+		<Row className="mx-5">
+		<Col className="mt-3 p-3 col-lg-4 text-center mx-auto">
+		<Image fluid src="https://cdn-icons-png.freepik.com/512/2798/2798007.png" className='mb-2'/>
+		<hr/>
+		<h1 className='mt-1'> { title } </h1>
+		<span> Year: {year} </span>
+		<p>Genre: {genre}</p>
+		<p>{description}</p>
+		<p><strong>Director:</strong> {director}</p>
+		
+		<div className='p-3 mt-3'>
+		<div className='my-5'>
+		<h3>Comments</h3>
+		<hr/>
+								{/* ✅ FIX: use div instead of <p> to avoid nested <p> */}
+		<div className='pt-3'>
+		{comments.length > 0 ? comments : "No Comments Yet"}
+		</div>
+	</div>
+	<div>
+	{user.id !== null 
+		? <Button variant="primary" size="sm" onClick={() => openComment(movieId)} className="mx-3"> Add Comment </Button> 
+		: "Please Login To Comment"
+	}
+	</div>
+	</div>
+	</Col>
+	</Row>
+	</Container>
 
-							</div>
+	<Modal show={showComment} onHide={closeComment}>
+	<Form onSubmit={e => addComment(e, movieId)}>
+	<Modal.Header closeButton>
+	<Modal.Title>Leave a Comment</Modal.Title>
+	</Modal.Header>
 
+	<Modal.Body>
+	<Form.Group>
+	<Form.Label>Your Comment:</Form.Label>
+	<Form.Control 
+	as="textarea" 
+	rows={3}
+	value={comment} 
+	onChange={e => setComment(e.target.value)} 
+	required/>
+	</Form.Group>
+	</Modal.Body>
 
-						</Col>
-					</Row>
-			</Container>
-
-			<Modal show={showComment} onHide={closeComment}>
-				<Form onSubmit={e => addComment(e, movieId)}>
-					<Modal.Header closeButton>
-						<Modal.Title>Leave a Comment</Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>
-						<Form.Group>
-							<Form.Label>Your Comment:</Form.Label>
-							<Form.Control 
-								as="textarea" 
-								rows={3}
-								value={comment} 
-								onChange={e => setComment(e.target.value)} 
-								required/>
-						</Form.Group>
-					</Modal.Body>
-
-					<Modal.Footer>
-						<Button variant="success" type="submit">Submit</Button>
-					</Modal.Footer>
-				</Form>
-			</Modal>
-		</>
+	<Modal.Footer>
+	<Button variant="success" type="submit">Submit</Button>
+	</Modal.Footer>
+	</Form>
+	</Modal>
+	</>
 	)
 }
